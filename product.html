@@ -21,61 +21,10 @@
         <a href="index.html" class="icon_home fa fa-home"></a>
     </header>
     <div class="cz_container ">
-        <div class="mui-scroll-wrapper">
-            <div class="mui-scroll">
-                <div class="cz_banner mui-slider">
-                    <div class="mui-slider-group mui-slider-loop">
-                        <div class="mui-slider-item mui-slider-item-duplicate">
-                            <a href="#"><img src="images/product.jpg"></a>
-                        </div>
-                        <div class="mui-slider-item mui-active">
-                            <a href="#"><img src="images/product.jpg"></a>
-                        </div>
-                        <div class="mui-slider-item mui-active">
-                            <a href="#"><img src="images/product.jpg"></a>
-                        </div>
-                        <div class="mui-slider-item mui-slider-item-duplicate">
-                            <a href="#"><img src="images/product.jpg"></a>
-                        </div>
-                    </div>
-                    <div class="mui-slider-indicator">
-                        <div class="mui-indicator mui-active"></div>
-                        <div class="mui-indicator"></div>
-                    </div>
+        <div class="mui-scroll-wrapper" >
+            <div class="mui-scroll" id="product_detail">
+
                 </div>
-                <div class="p_title">
-                    Nike耐克 男式 NIKE AIR MAX 1 PND QS复刻休闲鞋
-                </div>
-                <div class="p_price">
-                    <span class="fold"><span>5.9</span>折</span>
-                    价格：<strong class="present">¥
-                    712.00</strong>
-                    <del class="original">¥1199.0</del>
-                </div>
-                <div class="p_size">
-                    尺码：
-                    <span class="btn_size">38</span>
-                    <span class="btn_size">39</span>
-                    <span class="btn_size">40</span>
-                    <span class="btn_size">41</span>
-                    <span class="btn_size">43</span>
-                    <span class="btn_size">44</span>
-                    <span class="btn_size">45</span>
-                </div>
-                <div class="p_number">
-                    数量：
-                    <span class="jian">-</span><input type="tel"/><span class="jia">+</span>
-                    剩余：0 件
-                </div>
-                <div class="p_detail">
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -84,6 +33,66 @@
     <a href="#" class="btn_addCart">加入购物车</a>
     <a href="#" class="btn_pay">立即购买</a>
 </div>
+<script  type="text/template"  id="tpl">
+
+    
+        <div class="cz_banner mui-slider">
+            <div class="mui-slider-group mui-slider-loop">
+                <div class="mui-slider-item mui-slider-item-duplicate">
+                    <a href="#"><img src="images/product.jpg"></a>
+                </div>
+                <div class="mui-slider-item mui-active">
+                    <a href="#"><img src="images/product.jpg"></a>
+                </div>
+                <div class="mui-slider-item mui-active">
+                    <a href="#"><img src="images/product.jpg"></a>
+                </div>
+                <div class="mui-slider-item mui-slider-item-duplicate">
+                    <a href="#"><img src="images/product.jpg"></a>
+                </div>
+            </div>
+            <div class="mui-slider-indicator">
+                <div class="mui-indicator mui-active"></div>
+                <div class="mui-indicator"></div>
+            </div>
+        </div>
+        <div class="p_title">
+           {{proName}}
+        </div>
+        <div class="p_price">
+            <span class="fold"><span>5.9</span>折</span>
+            价格：<strong class="present">¥
+            712.00</strong>
+            <del class="original">¥1199.0</del>
+        </div>
+        <div class="p_size">
+            尺码：
+            <span class="btn_size">38</span>
+            <span class="btn_size">39</span>
+            <span class="btn_size">40</span>
+            <span class="btn_size">41</span>
+            <span class="btn_size">43</span>
+            <span class="btn_size">44</span>
+            <span class="btn_size">45</span>
+        </div>
+        <div class="p_number">
+            数量：
+            <span class="jian">-</span><input type="tel"/><span class="jia">+</span>
+            剩余：0 件
+        </div>
+        <div class="p_detail">
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+        </div>
+    
+
+</script>
+<script src="./js/jquery-1.12.4.min.js"></script>
+<script src="./js/template-web.js"></script>
 <script src="res/mui/js/mui.min.js"></script>
 <script src="res/mui/js/mui.lazyload.js"></script>
 <script src="res/mui/js/mui.lazyload.img.js"></script>
@@ -117,6 +126,25 @@
             placeholder: '../images/user.jpg'
         });
     });
+
+    // 获取url 地址栏上的id
+      let search=location.search.slice(1);
+      console.log(search);
+         let arr= search.split('=');
+        //  console.log(arr);
+         let obj={"id":arr[1]};
+        //  console.log(obj);
+    //请求商品数据 发生ajax请求 
+    $.ajax({
+        url:'/api/product/queryProductDetail',
+        type:'get',
+        data:obj,
+        success:function(info){
+            console.log(info);
+            let html =template('tpl',info);
+            $('#product_detail').html(html);
+        }
+    })
 </script>
 
 </body>
