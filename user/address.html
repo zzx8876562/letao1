@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0"/>
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <title>收货地址管理</title>
+    <link type="image/x-icon" rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="stylesheet" href="../res/mui/css/mui.min.css"/>
+    <link rel="stylesheet" href="../res/fontAwesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="../css/common.css"/>
+    <link rel="stylesheet" href="../css/user.css"/>
+</head>
+<body>
+<div class="cz_layout bgg">
+    <header class="cz_topBar">
+        <a href="javascript:history.back();" class="icon_back fa fa-arrow-left"></a>
+        <span class="title">收货地址管理</span>
+    </header>
+    <div class="cz_container">
+        <ul class="mui-table-view" id="table-view">
+          
+           
+        </ul>
+        <div class="wrap">
+            <a href="./addressManage.html" class="mui-btn mui-btn-primary btn_login ">新增地址</a>
+        </div>
+    </div>
+    <footer class="cz_tabs">
+        <a class="tab_home fa fa-home" href="../index.html"><span>首页</span></a>
+        <a class="tab_cate fa fa-bars" href="../cate.html"><span>分类</span></a>
+        <a class="tab_cart fa fa-shopping-cart" href="../cart.html"><span>购物车</span></a>
+        <a class="tab_user fa fa-user" href="../user/index.html"><span>会员中心</span></a>
+    </footer>
+</div>
+<script  type="text/template"  id="tpl">
+    {{each  list value}}
+    <li class="mui-table-view-cell">
+        <div class="mui-slider-right mui-disabled">
+            <a class="mui-btn mui-btn-red" data="{{value.id}}" >删除</a>
+        </div>
+        <a href="javascript:;" class="mui-navigate-right mui-slider-handle">
+            <div class="delivery">邮编：<span>{{value.postCode}}</span>&nbsp;收货人：<span>{{value.recipients}}</span></div>
+            <div class="address">{{value.addressDetail
+                }}</div>
+        </a>
+    </li>
+    {{/each}}
+</script>
+<script src="../js/jquery-1.12.4.min.js"></script>
+<script src="../js/template-web.js"></script>
+<script src="../res/mui/js/mui.min.js"></script>
+<script>
+      //发生ajax 请求
+        //    let  data ={address:}
+      $.ajax({
+          url:'/api/address/queryAddress',
+          type:'get',
+        success:function(data){
+            console.log(data);
+              if(data.error)
+              return location.href='/user/login.html?url='+location.href;
+            let  obj ={"list":data};
+            let str =template('tpl',obj);
+            $('#table-view').html(str);
+            
+        }
+      })
+        // 删除 a  链接注册点击事件 
+         $('#table-view').on('click','.mui-btn-red',function(){
+            //   console.log($(this));
+              var that =$(this);
+              let id =$(this).attr('data');
+              console.log(id);
+              //发生ajax 请求
+              $.ajax({
+                  url:'/api/address/deleteAddress',
+                  type:'post',
+                  data:{id:id},
+                  success:function(data){
+                      //在节点上删除
+                    //   that.perents('li').remove();
+                   confirm('您确定删除吗',function(){
+                    that.parents('li').fadeOut(function(){
+                              $(this).remove();
+                   })
+                        
+                         })
+                      console.log(data);
+                  }
+              })
+
+         })
+</script>
+</body>
+</html>
