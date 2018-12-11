@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./assets/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="./assets/nprogress/nprogress.css">
     <link rel="stylesheet" href="./css/index.css">
+    
 </head>
 <body>
     
@@ -126,7 +127,9 @@
                                 <th>操作</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tbd">
+                             
+                            
                         </tbody>
                     </table>
                 </div>
@@ -135,23 +138,25 @@
     </div>
     <!-- 自定义模板 -->
     <script type="text/html" id="tpl">
-        {{each rows val key}}
+        {{each rows value key}}
         <tr>
-            <td>{{key+1}}</td>
-            <td>{{val.username}}</td>
-            <td>{{val.mobile}}</td>
-            {{if(val.isDelete == 0)}}
-            <td>是</td>
-            {{else}}
-            <td>否</td>
-            {{/if}}
-            <td data-id="{{val.id}}" data-status={{val.isDelete}}>
-                {{if(val.isDelete == 0)}}
-                <a href="javascript:;" class="btn btn-info btn-xs">启 用</a>
-                {{else}}
-                <a href="javascript:;" class="btn btn-warning btn-xs">禁 用</a>
-                {{/if}}
-            </td>
+                <tr>
+                        <td>{{key+1}}</td>
+                        <td>{{value.username}}</td>
+                        <td>{{value.mobile}}</td>
+                        {{if value.isDelete==1}}
+                        <td>是</td>
+                        {{else}}
+                        <td>否</td>
+                        {{/if}}
+                        <td data-id="{{value.id}}" data-status="{{value.isDelete}}">  
+                            {{if  value.isDelete==0}} 
+                            <a href="javascript:;" class="btn btn-d btn-info btn-xs">启 用</a>
+                            {{else}}
+                            <a href="javascript:;" class="btn btn-d btn-warning btn-xs">禁 用</a>
+                            {{/if}}
+                        </td>
+                    </tr>
         </tr>
         {{/each}}
     </script>
@@ -160,60 +165,68 @@
     <script src="./assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="./assets/nprogress/nprogress.js"></script>
     <script src="./js/common.js"></script>
+   
     <script>
-        // 
+        // 检测登录
         $.ajax({
-            url: '/api/user/queryUser',
-            type: 'get',
-            data: {
-                page: 1,
-                pageSize: 100
-            },
-            success: function (info) {
-                console.log(info);
-                // 调用模板引擎
-                var html = template('tpl', info);
-                // 添加DOM
-                $('tbody').html(html);
+            url:'/api/employee/checkRootLogin',
+            type:'get',
+            success:function(info){
+                if(info.error){
+                    location.href='./login.html?url='+location.href;
+                }
             }
-        });
+        })
+        //查询用户 发生ajax 请求
+        $.ajax({
+            url:'/api/user/queryUser',
+            type:'get',
+            data:{page:1,size:5},
+            success:function(info){
+                console.log(info);
+                 let html =template('tpl',info);
+                 $('#tbd').html(html);
 
-        // 修改用户状态
-        $('tbody').on('click', 'a.btn', function () {
-            // 获取参数
-            var _this = $(this);
-            var td = $(this).parent();
-            var id = td.attr('data-id');
-            var status = td.attr('data-status');
-            
-            // 让 0 和 1 之间切换
-            status = Math.abs(status - 1);
+                  
+            }
+        })
+        //用事件委托注册点击事件
+        $('#tbd').on('click','.btn-d',function(){
+            // 改变样式  
+            $(this).toggleClass('btn-info btn-warning');
+            // console.log(11);
+            var that =$(this);
+            var td=$(this).parent();
+            var  id = $(this).parent().attr('data-id');
+           var n=1;
 
+            var isDelete=$(this).parent().attr('data-status');
+            isDelete=Math.abs(isDelete-n);
+            // console.log(isDelete);
+            console.log(id,isDelete);
+
+            //发生ajax请求
             $.ajax({
-                url: '/api/user/updateUser',
-                type: 'post',
-                data: {
-                    id: id,
-                    isDelete: status
+                url:'/api/user/updateUser',
+                type:'post',
+                data:{
+                    id:id,
+                    isDelete:isDelete
                 },
-                success: function (info) {
-                    if(info.success) {
-                        // 按钮颜色
-                        _this.toggleClass('btn-warning btn-info');
-                        // dom 中记录的状态数据中一致
-                        td.attr('data-status', status);
-
-                        if(status == 0) {
-                            _this.text('启 用');
+                success:function(info){
+                    console.log(info);
+                    if(info.success){
+                        that.parent().attr('data-status',isDelete);
+                        if(td.attr('data-status')==0){
                             td.prev().text('是');
-                            return;
                         }
-
-                        _this.text('禁 用');
-                        td.prev().text('否');
+                        else{
+                            td.prev().text('否');
+                        }
                     }
                 }
-            });
+
+            })
         })
     </script>
 </body>
